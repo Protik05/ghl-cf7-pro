@@ -121,7 +121,7 @@ class Ghl_Cf7_Pro {
 		 * side of the site.
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ghl-cf7-pro-public.php';
-
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/settings-page.php';
 		$this->loader = new Ghl_Cf7_Pro_Loader();
 
 	}
