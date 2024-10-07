@@ -122,6 +122,7 @@ class Ghl_Cf7_Pro {
 		 */
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ghl-cf7-pro-public.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/settings-page.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'ghl_cf7pro_api/ghl-cf7pro-all-apis.php';
 		$this->loader = new Ghl_Cf7_Pro_Loader();
 
 	}
@@ -156,6 +157,12 @@ class Ghl_Cf7_Pro {
 
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_styles' );
 		$this->loader->add_action( 'admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts' );
+
+		$this->loader->add_filter('wpcf7_editor_panels', $plugin_admin, 'ghlcf7pro_form_settings_tab');
+		$this->loader->add_action('wpcf7_save_contact_form', $plugin_admin, 'ghlcf7pro_save_form_settings');
+	
+	    $this->loader->add_action('wp_loaded',$plugin_admin,'connect_to_ghlcf7pro');
+	    $this->loader->add_action('wp_loaded',$plugin_admin,'refresh_ghl_token_ghlcf7pro');
 
 	}
 

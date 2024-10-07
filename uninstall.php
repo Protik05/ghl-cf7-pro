@@ -29,3 +29,27 @@
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
+global $wpdb;
+// Delete ghlex_subaccount table
+if ( is_multisite() ) {
+    // For multisite installations, delete both tables for each site
+    $sites = get_sites();
+    foreach ( $sites as $site ) {
+        $site_id = $site->blog_id;
+
+        // Delete ghlex_subaccount table
+        $table_name_subaccount = $wpdb->get_blog_prefix( $site_id ) . "ghlcf7pro_formSpecMapping";
+        $wpdb->query( "DROP TABLE IF EXISTS $table_name_subaccount" );
+
+        // Delete ghlexform_mapping table
+        $table_name_mapping = $wpdb->get_blog_prefix( $site_id ) . "ghlcf7pro_GlobalMapping";
+        $wpdb->query( "DROP TABLE IF EXISTS $table_name_mapping" );
+    }
+} else {
+    // For non-multisite installations, delete both tables for the main site
+    $table_name_subaccount = $wpdb->prefix . "ghlcf7pro_formSpecMapping";
+    $wpdb->query( "DROP TABLE IF EXISTS $table_name_subaccount" );
+
+    $table_name_mapping = $wpdb->prefix . "ghlcf7pro_GlobalMapping";
+    $wpdb->query( "DROP TABLE IF EXISTS $table_name_mapping" );
+}

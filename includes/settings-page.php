@@ -15,7 +15,7 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
 			$page_title 	= __( 'GHL for CF7 Pro', 'ghl-cf7' );
 			$menu_title 	= __( 'GHL for CF7 Pro', 'ghl-cf7' );
 			$capability 	= 'manage_options';
-			$menu_slug 		= 'ib-ghlcf7-pro';
+			$menu_slug 		= 'ib-ghlcf7pro';
 			$callback   	= array( $this, 'ghlcf7pro_page_content' );
 			$icon_url   	= 'dashicons-admin-plugins';
 			add_menu_page( $page_title, $menu_title, $capability, $menu_slug, $callback, $icon_url );
@@ -39,21 +39,38 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
 
         </div>
 
-        <h1>GHL for Contact Form 7</h1>
+        <h1>GHL for Contact Form 7 Pro </h1>
     </div>
     <div class="ghl-container">
 
         <div class="ghl-content">
             <div class="ghl-tabs">
                 <h2 class="nav-tab-wrapper-vertical">
-                    <a href="?page=ib-ghlcf7"
+                    <a href="?page=ib-ghlcf7pro"
                         class="nav-tab <?php if($tab===null):?>nav-tab-active<?php endif; ?>">Connect with GHL</a>
+                    <a href="?page=ib-ghlcf7pro&tab=global"
+                        class="nav-tab <?php if($tab==='global'):?>nav-tab-active<?php endif; ?>">Global Tags</a>
+                    <a href="?page=ib-ghlcf7pro&tab=lickey"
+                        class="nav-tab <?php if($tab==='lickey'):?>nav-tab-active<?php endif; ?>">License
+                        Key</a>
+
+                    <a href="?page=ib-ghlcf7pro&tab=support"
+                        class="nav-tab <?php if($tab==='support'):?>nav-tab-active<?php endif; ?>">Help/Support</a>
                 </h2>
             </div>
 
 
             <div class="tab-content">
                 <?php switch($tab) :
+					case 'lickey':
+						require_once plugin_dir_path( __FILE__ )."/ghl-cf7-pro-lic-keys.php";
+						break;	
+					case 'global':
+						require_once plugin_dir_path( __FILE__ )."/ghl-cf7-pro-global-tags.php";
+						break;
+					case 'support':
+						require_once plugin_dir_path( __FILE__ )."/help-page.php";
+					break;
 					default:
 						require_once plugin_dir_path( __FILE__ )."/settings-form.php"; 
 						break;
@@ -69,7 +86,7 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
 		
 
 		public function ghlcf7pro_add_settings_link( $links ) {
-	        $newlink = sprintf( "<a href='%s'>%s</a>" , admin_url( 'admin.php?page=ib-ghlcf7-pro' ) , __( 'Settings' , 'ghl-cf7-pro' ) );
+	        $newlink = sprintf( "<a href='%s'>%s</a>" , admin_url( 'admin.php?page=ib-ghlcf7pro' ) , __( 'Settings' , 'ghl-cf7-pro' ) );
 	        $links[] = $newlink;
 	        return $links;
 	    }
