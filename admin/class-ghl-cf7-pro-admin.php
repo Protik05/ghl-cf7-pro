@@ -117,8 +117,9 @@ class Ghl_Cf7_Pro_Admin {
 
 	function ghlcf7pro_save_form_settings($contact_form) {
 	// Retrieve values from the form
-	$inputValue = isset($_POST['ghlcf7_tag']) ? sanitize_text_field($_POST['ghlcf7_tag']) : '';
-	update_option( 'ghlcf7_tag_'.$contact_form->id, $inputValue);
+	$inputValue = isset($_POST['ghlcf7pro_tag']) ? sanitize_text_field($_POST['ghlcf7pro_tag']) : '';
+ 
+	update_option( 'ghlcf7pro_tag_'.$contact_form->id, $inputValue);
 	// Retrieve GHL-Form field mappings
     $ghl_fields_map = array();
     
@@ -135,13 +136,48 @@ class Ghl_Cf7_Pro_Admin {
                 );
             }
         }
+    // update_option( 'ghl_fields_map_'.$contact_form->id, $ghl_fields_map );
+
+    
+    //save it inside our own table.
+    global $wpdb;
+    $table_name = $wpdb->prefix . "ghlcf7pro_formSpecMapping";
+    $form_option_name = 'ghl_fields_map_' . $contact_form->id;
+   // Convert the $ghl_fields_map array to JSON
+    $form_fields_json = json_encode($ghl_fields_map);
+    $existing_row = $wpdb->get_row($wpdb->prepare("SELECT * FROM $table_name WHERE Form_option_name	= %s", $form_option_name));
+    //  var_dump($existing_row);
+    if ($existing_row) {
+		// Update the existing record
+		$result = $wpdb->update(
+			$table_name,
+			array(
+				'Form_option_name' => $form_option_name,
+				'Form_fields' => $form_fields_json,
+                'Custom_fields'       => '{}', // Insert empty JSON object
+                'Opportunity_fields'  => '{}'  // Insert empty JSON object
+			),
+			array('id' => $existing_row->id), 
+			array('%s', '%s' ,'%s', '%s'),
+			array('%d') 
+		);
+	}
+    else{
+        //insert
+        $result_new = $wpdb->insert(
+			$table_name,
+			array(
+				'Form_option_name' => $form_option_name,
+				'Form_fields' => $form_fields_json,
+                'Custom_fields'       => '{}', // Insert empty JSON object
+                'Opportunity_fields'  => '{}'  // Insert empty JSON object
+			),
+			array('%s', '%s' ,'%s', '%s')
+		);
     }
-    // echo '<pre>';
-	// print_r($ghl_fields_map);
-	// echo '</pre>';
-	// die('mapping');
-	// Save the mapping array
-    update_option( 'ghl_fields_map_'.$contact_form->id, $ghl_fields_map );
+    }
+    
+        
 }
 
 
@@ -265,6 +301,119 @@ public function connect_to_ghlcf7pro()
         }
 
     }
+
+    //send data to ghl crm
+    //cf7 after form submission hook.
+   function ghlcf7pro_send_form_data_to_api($contact_form) {
+		// Get the submitted form data
+		$submission = WPCF7_Submission::get_instance();
+		$form_id = $contact_form->id();
+        $location_id = (!empty(get_option("ghlcf7pro_locationId_" . $form_id))) ? get_option("ghlcf7pro_locationId_" . $form_id) : get_option("ghlcf7pro_locationId"); 
+		$tags= (!empty(get_option("ghlcf7pro_tag_" . $form_id))) ? get_option("ghlcf7pro_tag_" . $form_id) : get_option("ghlcf7pro-global-tag-names");
+		
+		if (!$submission) {
+			return;
+		}
+		$posted_data = $submission->get_posted_data();
+        $defined_fields=get_option('ghl_fields_map_'.$form_id);
+		// Initialize the ghl_args array
+        $ghl_args = [];
+
+        if (!empty($defined_fields)) {
+            // Loop through defined_fields and map values from posted_data
+            foreach ($defined_fields as $field) {
+                $key = $field['key'];      // e.g., 'firstName'
+                $value = $field['value'];  // e.g., 'full_name'
+                
+                // Check if the value exists in the posted_data
+                if (isset($posted_data[$value])) {
+                    $ghl_args[$key] = $posted_data[$value];
+                }
+            }
+        }
+        //add the location_id inside the array.
+         $ghl_args['locationId'] = $location_id;
+         $ghl_args['tags']=$tags;
+        // Output the result
+        // echo '<pre>';
+        // print_r($ghl_args);
+        // echo '</pre>';
+        // die('final');
+            
+		//$locationId = get_option( 'ghlcf7_locationId' );
+		// if (!$posted_data) {
+		// 	return;
+		// }
+		// //get te mapped value
+		// $CheckNameFields = get_option('ghlcf7_name_fields', []);
+		// $CheckEmailValue = get_option('ghlcf7_email_field');
+		// $CheckPhoneValue = get_option('ghlcf7_phne_field');
+		
+
+			//dynamically fetch the field name.
+			// $name_field_value = '';
+			// $email_field_value = '';
+			// $phone_field_value = '';
+			// // Loop through the posted data from Contact Form 7
+			// foreach ($posted_data as $key => $value) {
+			// 	// Loop through the saved name fields
+			// 	foreach ($CheckNameFields as $field) {
+			// 		// Check if the key matches any of the saved name field values
+			// 		if ($key === $field['value']) {
+			// 			// Append the posted data value to the name field value
+			// 			$name_field_value .= ' ' . $value;
+			// 			break; // Exit the inner loop once a match is found
+			// 		}
+			// 	}
+			// 	if (strcmp($key, $CheckEmailValue) == 0) {
+			// 		$email_field_value = $value;
+			// 	} 
+			// 	elseif (strcmp($key, $CheckPhoneValue) == 0) {
+			// 		$phone_field_value = $value;
+			// 	}
+			// }
+
+       // Trim any leading or trailing whitespace
+		// $name_field_value = trim($name_field_value);
+        //if checkbox is checked.
+		// if(get_option('ghlcf7_checkbox_'.$form_id)){
+			//check the particular location tag and the global tags.
+			// $tags = (!empty(get_option("ghlcf7_tag_".$form_id)) && get_option("ghlcf7_tag_".$form_id) !== false) ? get_option("ghlcf7_tag_".$form_id) : ((get_option("ghlcf7-global-tag-names") !== false) ? get_option("ghlcf7-global-tag-names") : "");
+			// // Prepare the data to be sent to the API
+			// $contact_data = array(
+			// 	"locationId"  => $locationId,
+			// 	'name' =>  $name_field_value,
+			// 	'email' => $email_field_value,
+			// 	'phone' => $phone_field_value,
+			// 	'tags'  => $tags,
+				
+			// );
+			
+			//implement auth V2 GHL API
+			$ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
+			$endpoint = "https://services.leadconnectorhq.com/contacts/upsert";
+			$ghl_version = '2021-07-28';
+
+			$request_args = array(
+				'body' 		=> $ghl_args,
+				'headers' 	=> array(
+					'Authorization' => "Bearer {$ghlcf7pro_access_token}",
+					'Version' 		=> $ghl_version
+				),
+			);
+
+			$response = wp_remote_post( $endpoint, $request_args );
+			$http_code = wp_remote_retrieve_response_code( $response );
+
+			if ( 200 === $http_code || 201 === $http_code ) {
+
+				$body = json_decode( wp_remote_retrieve_body( $response ) );
+				$contact = $body->contact;
+
+				return $contact;
+			}
+		// }
+	}
 
 
 }

@@ -16,14 +16,34 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update options for all rows
     updateFieldOptions();
   }
+  // Add row for Custom Fields
+  function addCustomRow() {
+    const customContainer = document.querySelector(".custom-fields-mapping");
+    const newRow = document.querySelector(".custom-fields-row").cloneNode(true);
+
+    newRow.querySelector("select[name='custom_field[]']").value = "";
+    newRow.querySelector("select[name='form_field[]']").value = "";
+
+    customContainer.appendChild(newRow);
+  }
 
   // Function to remove a row of fields
+  // function removeRow(event) {
+  //   const row = event.target.closest(".mapping-fields-row");
+  //   if (document.querySelectorAll(".mapping-fields-row").length > 1) {
+  //     row.remove();
+  //   }
+  //   updateFieldOptions(); // Update the available options after removing a row
+  // }
+  // Remove GHL or Custom Field row
   function removeRow(event) {
-    const row = event.target.closest(".mapping-fields-row");
-    if (document.querySelectorAll(".mapping-fields-row").length > 1) {
+    const row = event.target.closest(".mapping-fields-row, .custom-fields-row");
+    if (
+      document.querySelectorAll(".mapping-fields-row").length > 1 ||
+      document.querySelectorAll(".custom-fields-row").length > 1
+    ) {
       row.remove();
     }
-    updateFieldOptions(); // Update the available options after removing a row
   }
 
   // Function to update the GHL field options to exclude already selected ones
@@ -127,12 +147,27 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Event listener for the Add Row button
+  // document
+  //   .querySelector(".mapping-fields-container")
+  //   .addEventListener("click", function (event) {
+  //     if (event.target.classList.contains("add-row")) {
+  //       addRow();
+  //     } else if (event.target.classList.contains("remove-row")) {
+  //       removeRow(event);
+  //     }
+  //   });
+  // Event listener for adding/removing rows
   document
     .querySelector(".mapping-fields-container")
     .addEventListener("click", function (event) {
       if (event.target.classList.contains("add-row")) {
         addRow();
-      } else if (event.target.classList.contains("remove-row")) {
+      } else if (event.target.classList.contains("add-custom-row")) {
+        addCustomRow();
+      } else if (
+        event.target.classList.contains("remove-row") ||
+        event.target.classList.contains("remove-custom-row")
+      ) {
         removeRow(event);
       }
     });

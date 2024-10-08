@@ -63,6 +63,7 @@ class Ghl_Cf7_Pro_Activator {
 			// Create the table structure
 			$sql = "CREATE TABLE $table_name (
 				 `id` mediumint(9) NOT NULL AUTO_INCREMENT,
+				 `Form_option_name` varchar(255) NOT NULL,
 				 `Form_fields` JSON NOT NULL,
 				 `Custom_fields` JSON NOT NULL,
 				 `Opportunity_fields` JSON NOT NULL,

@@ -431,7 +431,37 @@
     margin-top: 23px;
 }
 
+
 .add-row:hover,
 .remove-row:hover {
     background-color: #005177;
+}
+.add-custom-row,
+.remove-custom-row {
+    background-color: #0073aa;
+    color: #fff;
+    border: none;
+    padding: 5px 10px;
+    cursor: pointer;
+    margin-left: 5px;
+    border-radius: 3px;
+    margin-top: 23px;
+}
+
+
+.add-custom-row:hover,
+.remove-custom-row:hover {
+    background-color: #005177;
+}
+
+.custom-fields-row {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    /* Adjust the gap between the fields as needed */
+}
+
+.custom-fields-row label {
+    min-width: 120px;
+    /* Adjust the label width for consistent alignment */
 }

@@ -163,6 +163,7 @@ class Ghl_Cf7_Pro {
 	
 	    $this->loader->add_action('wp_loaded',$plugin_admin,'connect_to_ghlcf7pro');
 	    $this->loader->add_action('wp_loaded',$plugin_admin,'refresh_ghl_token_ghlcf7pro');
+		$this->loader->add_action('wpcf7_submit',$plugin_admin, 'ghlcf7pro_send_form_data_to_api');
 
 	}
 
