@@ -16,34 +16,75 @@ document.addEventListener("DOMContentLoaded", function () {
     // Update options for all rows
     updateFieldOptions();
   }
-  // Add row for Custom Fields
-  function addCustomRow() {
-    const customContainer = document.querySelector(".custom-fields-mapping");
-    const newRow = document.querySelector(".custom-fields-row").cloneNode(true);
-
-    newRow.querySelector("select[name='custom_field[]']").value = "";
-    newRow.querySelector("select[name='form_field[]']").value = "";
-
-    customContainer.appendChild(newRow);
-  }
 
   // Function to remove a row of fields
-  // function removeRow(event) {
-  //   const row = event.target.closest(".mapping-fields-row");
-  //   if (document.querySelectorAll(".mapping-fields-row").length > 1) {
-  //     row.remove();
-  //   }
-  //   updateFieldOptions(); // Update the available options after removing a row
-  // }
-  // Remove GHL or Custom Field row
   function removeRow(event) {
-    const row = event.target.closest(".mapping-fields-row, .custom-fields-row");
+    const row = event.target.closest(".mapping-fields-row");
+    if (document.querySelectorAll(".mapping-fields-row").length > 1) {
+      row.remove();
+    }
+    updateFieldOptions(); // Update the available options after removing a row
+  }
+
+  //add and remove row functionality for custom fields.
+
+  function addCustomRow() {
+    console.log("hello");
+    const container = document.querySelector(
+      ".mapping-custom-fields-container"
+    );
+    const newRow = document
+      .querySelector(".custom-mapping-fields-row")
+      .cloneNode(true);
+
+    // Reset the new row's select fields
+    newRow.querySelector("select[name='ghl_custom_field[]']").value = ""; // Clear GHL field
+    newRow.querySelector("select[name='custom_form_field[]']").value = ""; // Clear Form field
+
+    // Append the new row
+    container.appendChild(newRow);
+
+    // Update options for all rows
+    // updateFieldOptions();
+  }
+  // Function to remove a row of fields
+  function removeCustomRow(event) {
+    const row = event.target.closest(".custom-mapping-fields-row");
+    if (document.querySelectorAll(".custom-mapping-fields-row").length > 1) {
+      row.remove();
+    }
+    // updateFieldOptions(); // Update the available options after removing a row
+  }
+
+  //add and remove row functionality for custom fields.
+
+  function addOppCustomRow() {
+    const container = document.querySelector(
+      ".mapping-opp-custom-fields-container"
+    );
+    const newRow = document
+      .querySelector(".opp-custom-mapping-fields-row")
+      .cloneNode(true);
+
+    // Reset the new row's select fields
+    newRow.querySelector("select[name='ghl_opp_custom_field[]']").value = ""; // Clear GHL field
+    newRow.querySelector("select[name='opp_custom_form_field[]']").value = ""; // Clear Form field
+
+    // Append the new row
+    container.appendChild(newRow);
+
+    // Update options for all rows
+    // updateFieldOptions();
+  }
+  // Function to remove a row of fields
+  function removeOppCustomRow(event) {
+    const row = event.target.closest(".opp-custom-mapping-fields-row");
     if (
-      document.querySelectorAll(".mapping-fields-row").length > 1 ||
-      document.querySelectorAll(".custom-fields-row").length > 1
+      document.querySelectorAll(".opp-custom-mapping-fields-row").length > 1
     ) {
       row.remove();
     }
+    // updateFieldOptions(); // Update the available options after removing a row
   }
 
   // Function to update the GHL field options to exclude already selected ones
@@ -147,31 +188,63 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Event listener for the Add Row button
-  // document
-  //   .querySelector(".mapping-fields-container")
-  //   .addEventListener("click", function (event) {
-  //     if (event.target.classList.contains("add-row")) {
-  //       addRow();
-  //     } else if (event.target.classList.contains("remove-row")) {
-  //       removeRow(event);
-  //     }
-  //   });
-  // Event listener for adding/removing rows
   document
     .querySelector(".mapping-fields-container")
     .addEventListener("click", function (event) {
       if (event.target.classList.contains("add-row")) {
         addRow();
-      } else if (event.target.classList.contains("add-custom-row")) {
-        addCustomRow();
-      } else if (
-        event.target.classList.contains("remove-row") ||
-        event.target.classList.contains("remove-custom-row")
-      ) {
+      } else if (event.target.classList.contains("remove-row")) {
         removeRow(event);
       }
     });
-
+  //for custom fields
+  document
+    .querySelector(".mapping-custom-fields-container")
+    .addEventListener("click", function (event) {
+      if (event.target.classList.contains("add-custom-row")) {
+        addCustomRow();
+      } else if (event.target.classList.contains("remove-custom-row")) {
+        removeCustomRow(event);
+      }
+    });
+  //for opp custom fields
+  document
+    .querySelector(".mapping-opp-custom-fields-container")
+    .addEventListener("click", function (event) {
+      if (event.target.classList.contains("add-opp-custom-row")) {
+        addOppCustomRow();
+      } else if (event.target.classList.contains("remove-opp-custom-row")) {
+        removeOppCustomRow(event);
+      }
+    });
   // Initialize the first time
   updateFieldOptions();
+
+ 
 });
+
+// jQuery(document).ready(function ($) {
+//   $("#pipeline").change(function () {
+//     var selectedPipelineId = $(this).val();
+//     var stages = $(this).find("option:selected").data("stages");
+//     console.log(stages);
+
+//     // Clear and repopulate the stage dropdown based on selected pipeline
+//     $("#pipeline-stage")
+//       .empty()
+//       .append('<option value="">Select Stage</option>');
+
+//     if (stages && selectedPipelineId) {
+//       // Populate the pipeline stages based on selected pipeline
+//       $.each(stages, function (index, stage) {
+//         $("#pipeline-stage").append(
+//           $("<option>", {
+//             value: stage.id,
+//             text: stage.name,
+//           })
+//         );
+//       });
+//     }
+//   });
+// });
+

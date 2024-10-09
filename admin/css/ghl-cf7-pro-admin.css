@@ -373,13 +373,13 @@
 
 
  /* mapping part css */
- .ghlcf7-tab-content .mapping-fields-row {
+ .ghlcf7-tab-content .mapping-fields-row .custom-mapping-fields-row .opp-custom-mapping-fields-row .pipeline-row{
      display: flex;
      align-items: center;
      margin-bottom: 15px;
  }
 
- .ghlcf7-tab-content .field-group {
+ .ghlcf7-tab-content .field-group .custom-field-group .opp-custom-field-group .pipeline-name{
      flex: 1;
      margin-right: 10px;
  }
@@ -397,30 +397,38 @@
  }
 
  @media (max-width: 768px) {
-     .ghlcf7-tab-content .mapping-fields-row {
+    .ghlcf7-tab-content .mapping-fields-row .custom-mapping-fields-row .opp-custom-mapping-fields-row .pipeline-row {
          flex-direction: column;
      }
 
-     .ghlcf7-tab-content .field-group {
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 .ghlcf7-tab-content .field-group .custom-field-group {
          margin-right: 0;
          margin-bottom: 10px;
      }
  }
 
  /* add and remove button css */
-.mapping-fields-row {
+.mapping-fields-row,
+.custom-mapping-fields-row,
+.opp-custom-mapping-fields-row,.pipeline-row {
     display: flex;
     align-items: center;
     margin-bottom: 15px;
 }
 
-.field-group {
+.field-group,
+.custom-field-group,
+.opp-custom-field-group,.pipeline-name,.pipeline-stage{
     flex: 1;
     margin-right: 10px;
 }
 
 .add-row,
-.remove-row {
+.remove-row,
+.add-custom-row,
+.remove-custom-row,
+.add-opp-custom-row,
+.remove-opp-custom-row {
     background-color: #0073aa;
     color: #fff;
     border: none;
@@ -433,35 +441,10 @@
 
 
 .add-row:hover,
-.remove-row:hover {
-    background-color: #005177;
-}
-.add-custom-row,
-.remove-custom-row {
-    background-color: #0073aa;
-    color: #fff;
-    border: none;
-    padding: 5px 10px;
-    cursor: pointer;
-    margin-left: 5px;
-    border-radius: 3px;
-    margin-top: 23px;
-}
-
-
+.remove-row:hover,
 .add-custom-row:hover,
-.remove-custom-row:hover {
+.remove-custom-row:hover,
+.add-opp-custom-row:hover,
+.remove-opp-custom-row:hover {
     background-color: #005177;
-}
-
-.custom-fields-row {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    /* Adjust the gap between the fields as needed */
-}
-
-.custom-fields-row label {
-    min-width: 120px;
-    /* Adjust the label width for consistent alignment */
 }
