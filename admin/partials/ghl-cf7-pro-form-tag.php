@@ -6,6 +6,7 @@ $server_url = "https://server.ibsofts.com/one-extension/market_app.php";
 $connect_url= add_query_arg(array('redirect_page' => $settings_url), $server_url);
 $loc_id=get_option('ghlcf7pro_locationId_' . $post->id);
 $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
+$oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
 
 ?>
 <div class="ghlcf7-tab-content">
@@ -120,14 +121,8 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
             </div>
             <div class="field-group">
                 <label>Form Fields:</label>
-                <select name="form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>" <?php selected($map['value'], $key); ?>>
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
+
+                <input type="text" name="form_field[]" value="<?php echo esc_attr($map['value']); ?>" />
             </div>
             <button type="button" class="add-row">+</button>
             <button type="button" class="remove-row">-</button>
@@ -151,14 +146,7 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
             </div>
             <div class="field-group">
                 <label>Form Fields:</label>
-                <select name="form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
+                <input type="text" name="form_field[]" value="" />
             </div>
             <button type="button" class="add-row">+</button>
             <button type="button" class="remove-row">-</button>
@@ -194,14 +182,7 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
             </div>
             <div class="field-group">
                 <label>Form Fields:</label>
-                <select name="custom_form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>" <?php selected($map['value'], $key); ?>>
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
+                <input type="text" name="custom_form_field[]" value="<?php echo esc_attr($map['value']); ?>" />
             </div>
             <button type="button" class="add-custom-row">+</button>
             <button type="button" class="remove-custom-row">-</button>
@@ -225,14 +206,7 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
             </div>
             <div class="field-group">
                 <label>Form Fields:</label>
-                <select name="custom_form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
+                <input type="text" name="custom_form_field[]" value="" />
             </div>
             <button type="button" class="add-custom-row">+</button>
             <button type="button" class="remove-custom-row">-</button>
@@ -242,146 +216,112 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
         }
         ?>
     </div>
-    <!-- opportunity custom fields container -->
-    <div class="mapping-opp-custom-fields-container">
-        <p>
-            <strong>GHL Opportunity custom fields mapping with Form fields</strong>
+    <div class="hide_opp">
+        <p class="hide_opp_text">
+            <strong>Want to send Opportunity Custom Fields value in GHL?</strong>
         </p>
-        <?php
+        <input type="checkbox" name="opp_check" value="yes" <?php checked($oppcheck, 'yes'); ?>>
+    </div>
+    <!-- opportunity custom fields container -->
+    <div class="ghlcf7pro_opp_hide">
+        <div class="mapping-opp-custom-fields-container">
+            <p>
+                <strong>GHL Opportunity custom fields mapping with Form fields</strong>
+            </p>
+            <?php
         //for custom fields and form fields mapping.
         if (!empty($opp_customfields_mapping)) {
             foreach ($opp_customfields_mapping as $map) {
                 ?>
-        <div class="opp-custom-mapping-fields-row">
-            <div class="opp-custom-field-group">
-                <label>GHL Opportunity Custom Fields:</label>
-                <select name="ghl_opp_custom_field[]">
-                    <option value="">Select a Field</option>
-                    <?php foreach ($opp_custom_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($label->id); ?>"
-                        <?php selected($map['key'], $label->id); // Check if the key matches and mark it as selected ?>>
-                        <?php echo esc_html($label->name); // Display the name from the custom fields ?>
-                    </option>
-                    <?php } ?>
-                </select>
+            <div class="opp-custom-mapping-fields-row">
+                <div class="opp-custom-field-group">
+                    <label>GHL Opportunity Custom Fields:</label>
+                    <select name="ghl_opp_custom_field[]">
+                        <option value="">Select a Field</option>
+                        <?php foreach ($opp_custom_fields as $key => $label) { ?>
+                        <option value="<?php echo esc_attr($label->id); ?>"
+                            <?php selected($map['key'], $label->id); // Check if the key matches and mark it as selected ?>>
+                            <?php echo esc_html($label->name); // Display the name from the custom fields ?>
+                        </option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Form Fields:</label>
+                    <input type="text" name="opp_custom_form_field[]" value="<?php echo esc_attr($map['value']); ?>" />
+                </div>
+                <button type="button" class="add-opp-custom-row">+</button>
+                <button type="button" class="remove-opp-custom-row">-</button>
             </div>
-            <div class="field-group">
-                <label>Form Fields:</label>
-                <select name="opp_custom_form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>" <?php selected($map['value'], $key); ?>>
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
-            </div>
-            <button type="button" class="add-opp-custom-row">+</button>
-            <button type="button" class="remove-opp-custom-row">-</button>
-        </div>
-        <?php
+            <?php
             }
         } else {
             // If no saved mapping, show a default empty row
             ?>
-        <div class="opp-custom-mapping-fields-row">
-            <div class="opp-custom-field-group">
-                <label>GHL Opportunity Custom Fields:</label>
-                <select name="ghl_opp_custom_field[]">
-                    <option value="">Select a Field</option>
-                    <?php foreach ($opp_custom_fields as $custom_field) { ?>
-                    <option value="<?php echo esc_attr($custom_field->id); ?>">
-                        <?php echo esc_html($custom_field->name); ?>
-                    </option>
-                    <?php } ?>
-                </select>
-            </div>
-            <div class="field-group">
-                <label>Form Fields:</label>
-                <select name="opp_custom_form_field[]">
-                    <option value="">Select Form Field</option>
-                    <?php foreach ($form_fields as $key => $label) { ?>
-                    <option value="<?php echo esc_attr($key); ?>">
-                        <?php echo esc_html($label); ?>
-                    </option>
-                    <?php } ?>
-                </select>
-            </div>
-            <button type="button" class="add-opp-custom-row">+</button>
-            <button type="button" class="remove-opp-custom-row">-</button>
+            <div class="opp-custom-mapping-fields-row">
+                <div class="opp-custom-field-group">
+                    <label>GHL Opportunity Custom Fields:</label>
+                    <select name="ghl_opp_custom_field[]">
+                        <option value="">Select a Field</option>
+                        <?php foreach ($opp_custom_fields as $custom_field) { ?>
+                        <option value="<?php echo esc_attr($custom_field->id); ?>">
+                            <?php echo esc_html($custom_field->name); ?>
+                        </option>
+                        <?php } ?>
+                    </select>
+                </div>
+                <div class="field-group">
+                    <label>Form Fields:</label>
+                    <input type="text" name="opp_custom_form_field[]" value="" />
+                </div>
+                <button type="button" class="add-opp-custom-row">+</button>
+                <button type="button" class="remove-opp-custom-row">-</button>
 
-        </div>
-        <?php
+            </div>
+            <?php
         }
         ?>
-    </div>
-    <?php
+        </div>
+        <?php
     // Simulate API response
     $get_stages = ghlcf7pro_get_pipeline($location_id, $ghlcf7pro_access_token);
     $saved_pipeline_name = get_option('ghl_pipeline_name_'.$post->id, ''); // Default empty if not set
-  $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
-
+    $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
+    $connected_location = get_option('ghlcf7pro_location_connected_'.$post->id, '');
+    // wp_enqueue_script('ghl-cf7-pro-admin', plugin_dir_url( __FILE__ ) .'/js/ghl-cf7-pro-pipeline.js', array('jquery'), '1.0.0', true);
+    //  wp_localize_script('ghl-cf7-pro-admin', 'ghlData', array(
+    // 'savedPipelineName' => $saved_pipeline_name,
+    // 'savedPipelineStage' => $saved_pipeline_stage,
+    // ));
+    
     // If API response contains data
     if (!empty($get_stages)) {
     ?>
-    <div class="pipeline-row">
-        <!-- Pipeline Name Dropdown -->
-        <div class="pipeline-name">
-            <label for="pipeline">Select Pipeline Name:</label>
-            <select id="pipeline" name="pipeline">
-                <option value="">Select Pipeline</option>
-                <?php foreach ($get_stages as $pipeline) { ?>
-                <option value="<?php echo esc_attr($pipeline->id); ?>"
-                    data-stages='<?php echo json_encode($pipeline->stages); ?>'
-                    <?php selected($pipeline->id, $saved_pipeline_name); ?>>
-                    <?php echo esc_html($pipeline->name); ?>
-                </option>
-                <?php } ?>
-            </select>
-        </div>
-        <div class="pipeline-stage">
-            <!-- Pipeline Stages Dropdown -->
-            <label for="pipeline-stage" id="pipeline-stage-label">Select Pipeline Stage:</label>
-            <select id="pipeline-stage" name="pipeline_stage">
-                <option value="">Select Stage</option>
-                <!-- Options will be populated dynamically using JavaScript -->
-            </select>
+        <div class="pipeline-row">
+            <!-- Pipeline Name Dropdown -->
+            <div class="pipeline-name">
+                <label for="pipeline">Select Pipeline Name:</label>
+                <select id="pipeline" name="pipeline">
+                    <option value="">Select Pipeline</option>
+                    <?php foreach ($get_stages as $pipeline) { ?>
+                    <option value="<?php echo esc_attr($pipeline->id); ?>"
+                        data-stages='<?php echo json_encode($pipeline->stages); ?>'
+                        <?php selected($pipeline->id, $saved_pipeline_name); ?>>
+                        <?php echo esc_html($pipeline->name); ?>
+                    </option>
+                    <?php } ?>
+                </select>
+            </div>
+            <div class="pipeline-stage">
+                <!-- Pipeline Stages Dropdown -->
+                <label for="pipeline-stage" id="pipeline-stage-label">Select Pipeline Stage:</label>
+                <select id="pipeline-stage" name="pipeline_stage">
+                    <option value="">Select Stage</option>
+                    <!-- Options will be populated dynamically using JavaScript -->
+                </select>
+            </div>
         </div>
     </div>
-    <script>
-    jQuery(document).ready(function($) {
-        var savedPipelineStage = '<?php echo esc_js($saved_pipeline_stage); ?>'; // Get the saved stage from PHP
-
-        // Populate the pipeline stage dropdown based on the selected pipeline
-        function populateStages(stages) {
-            $('#pipeline-stage').empty().append('<option value="">Select Stage</option>');
-            $.each(stages, function(index, stage) {
-                $('#pipeline-stage').append(
-                    $('<option>', {
-                        value: stage.id,
-                        text: stage.name,
-                        selected: stage.id ===
-                            savedPipelineStage // Set as selected if it matches the saved value
-                    })
-                );
-            });
-        }
-
-        // Trigger population of stages based on previously saved pipeline name
-        var selectedPipeline = $('#pipeline').val();
-        if (selectedPipeline) {
-            var stages = $('#pipeline option:selected').data('stages');
-            populateStages(stages);
-        }
-
-        // Handle pipeline name change
-        $('#pipeline').change(function() {
-            var stages = $(this).find('option:selected').data('stages');
-            populateStages(stages);
-        });
-    });
-    </script>
-
     <?php
 } else {
     echo "No pipelines available.";
@@ -391,12 +331,19 @@ $loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
         <label for="ghlcf7pro_tag">Enter Tags to Send:</label>
         <input type="text" id="ghlcf7pro_tag" name="ghlcf7pro_tag" value="<?php echo esc_attr($inputValue); ?>">
     </div>
-
+    <?php if ($connected_location) { ?>
     <div class="form-spe">
         <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
-        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect Another
+        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
             Subaccount</a>
         <p>Location ID: <?php echo esc_html($loc_id); ?></p>
         <p>Location Name: <?php echo esc_html($loc_name); ?></p>
     </div>
+    <?php } else { ?>
+    <div class="form-spe">
+        <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
+        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
+            Subaccount</a>
+    </div>
+    <?php } ?>
 </div>

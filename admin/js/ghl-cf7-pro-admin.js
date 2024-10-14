@@ -8,9 +8,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Reset the new row's select fields
     newRow.querySelector("select[name='ghl_field[]']").value = ""; // Clear GHL field
-    newRow.querySelector("select[name='form_field[]']").value = ""; // Clear Form field
+    // newRow.querySelector("select[name='form_field[]']").value = ""; // Clear Form field
+    // Reset the new row's input field for Form field
+    const formFieldInput = newRow.querySelector("input[name='form_field[]']");
+    formFieldInput.value = ""; // Clear text input for Form field
 
-    // Append the new row
+    // Append the new row to the container
     container.appendChild(newRow);
 
     // Update options for all rows
@@ -29,7 +32,6 @@ document.addEventListener("DOMContentLoaded", function () {
   //add and remove row functionality for custom fields.
 
   function addCustomRow() {
-    console.log("hello");
     const container = document.querySelector(
       ".mapping-custom-fields-container"
     );
@@ -39,8 +41,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Reset the new row's select fields
     newRow.querySelector("select[name='ghl_custom_field[]']").value = ""; // Clear GHL field
-    newRow.querySelector("select[name='custom_form_field[]']").value = ""; // Clear Form field
-
+    //newRow.querySelector("select[name='custom_form_field[]']").value = ""; // Clear Form field
+    const formFieldInput = newRow.querySelector(
+      "input[name='custom_form_field[]']"
+    );
+    formFieldInput.value = ""; // Clear text input for Form field
     // Append the new row
     container.appendChild(newRow);
 
@@ -68,8 +73,11 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Reset the new row's select fields
     newRow.querySelector("select[name='ghl_opp_custom_field[]']").value = ""; // Clear GHL field
-    newRow.querySelector("select[name='opp_custom_form_field[]']").value = ""; // Clear Form field
-
+    //newRow.querySelector("select[name='opp_custom_form_field[]']").value = ""; // Clear Form field
+    const formFieldInput = newRow.querySelector(
+      "input[name='opp_custom_form_field[]']"
+    );
+    formFieldInput.value = ""; // Clear text input for Form field
     // Append the new row
     container.appendChild(newRow);
 
@@ -219,32 +227,61 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   // Initialize the first time
   updateFieldOptions();
-
- 
 });
 
-// jQuery(document).ready(function ($) {
-//   $("#pipeline").change(function () {
-//     var selectedPipelineId = $(this).val();
-//     var stages = $(this).find("option:selected").data("stages");
-//     console.log(stages);
+jQuery(document).ready(function ($) {
+  var urlParams = new URLSearchParams(window.location.search);
 
-//     // Clear and repopulate the stage dropdown based on selected pipeline
-//     $("#pipeline-stage")
-//       .empty()
-//       .append('<option value="">Select Stage</option>');
+  // Get the 'post' parameter from the URL
+  var form_id = urlParams.get("post");
+  $.ajax({
+    url: ghlcf7pro_form_data.ajaxurl,
+    type: "POST",
+    data: {
+      action: "ghlcf7pro_check_form_data",
+      form_id: form_id,
+    },
+    // beforeSend: function () {
+    //   $(".ghl-form").addClass("loading");
+    // },
+    success: function (response) {
+      if (response.data.success === true) {
+        var savedPipelineStage = response.data.pipeline_stages; // Get the saved stage from PHP
+        var oppcheck = response.data.opp_check;
+        if (oppcheck == 'no') {
+          $(".ghlcf7pro_opp_hide").css("display", "none");
+        }
+          // Populate the pipeline stage dropdown based on the selected pipeline
+          function populateStages(stages) {
+            $("#pipeline-stage")
+              .empty()
+              .append('<option value="">Select Stage</option>');
+            $.each(stages, function (index, stage) {
+              $("#pipeline-stage").append(
+                $("<option>", {
+                  value: stage.id,
+                  text: stage.name,
+                  selected: stage.id === savedPipelineStage, // Set as selected if it matches the saved value
+                })
+              );
+            });
+          }
 
-//     if (stages && selectedPipelineId) {
-//       // Populate the pipeline stages based on selected pipeline
-//       $.each(stages, function (index, stage) {
-//         $("#pipeline-stage").append(
-//           $("<option>", {
-//             value: stage.id,
-//             text: stage.name,
-//           })
-//         );
-//       });
-//     }
-//   });
-// });
+        // Trigger population of stages based on previously saved pipeline name
+        var selectedPipeline = $("#pipeline").val();
+        if (selectedPipeline) {
+          var stages = $("#pipeline option:selected").data("stages");
+          populateStages(stages);
+        }
+
+        // Handle pipeline name change
+        $("#pipeline").change(function () {
+          var stages = $(this).find("option:selected").data("stages");
+          populateStages(stages);
+        });
+      }
+    },
+  });
+});
+
 

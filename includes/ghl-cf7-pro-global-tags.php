@@ -5,12 +5,14 @@ if ( ! defined( 'ABSPATH' ) ) exit;
 if (isset($_POST['ghl_global'])) {
     // Sanitize and save the form value
     $global_tags = sanitize_text_field($_POST['global-tags']);
+    $global_checkbox = isset($_POST['glob_check']) ? 'yes' : 'no'; 
     update_option('ghlcf7pro-global-tag-names', $global_tags);
+    update_option('ghlcf7pro-global-checkbox', $global_checkbox);
 }
 
 // Retrieve the saved value to display in the form
 $CheckglobalTag = get_option('ghlcf7pro-global-tag-names', '');
-// $globalcheck=get_option('ghlcf7pro-global-tag-names', '');
+$globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
 ?>
 
 <div id="ghlcf7-options">
@@ -34,7 +36,7 @@ $CheckglobalTag = get_option('ghlcf7pro-global-tag-names', '');
                         <label><?php esc_html_e('Send global tags with form specific tags: ', 'ghl-cf7'); ?></label>
                     </th>
                     <td>
-                        <input type="checkbox" name="glob_check">
+                        <input type="checkbox" name="glob_check" value="yes" <?php checked($globalcheck, 'yes'); ?>>
                     </td>
                 </tr>
 

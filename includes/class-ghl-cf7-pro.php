@@ -164,7 +164,9 @@ class Ghl_Cf7_Pro {
 	    $this->loader->add_action('wp_loaded',$plugin_admin,'connect_to_ghlcf7pro');
 	    $this->loader->add_action('wp_loaded',$plugin_admin,'refresh_ghl_token_ghlcf7pro');
 		$this->loader->add_action('wpcf7_submit',$plugin_admin, 'ghlcf7pro_send_form_data_to_api');
-
+        $this->loader->add_action( 'wp_ajax_ghlcf7pro_check_form_data', $plugin_admin, 'ghlcf7pro_check_form_data'); 
+		//test part
+		// $this->loader->add_filter('wpcf7_form_tag_data_option',$plugin_admin, 'test_cf7pro', 10, 3);
 	}
 
 	/**

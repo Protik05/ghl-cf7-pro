@@ -429,7 +429,7 @@
 .remove-custom-row,
 .add-opp-custom-row,
 .remove-opp-custom-row {
-    background-color: #0073aa;
+    background-color: #f6861e;
     color: #fff;
     border: none;
     padding: 5px 10px;
@@ -446,5 +446,22 @@
 .remove-custom-row:hover,
 .add-opp-custom-row:hover,
 .remove-opp-custom-row:hover {
-    background-color: #005177;
+    background-color: transparent;
+        color: #f6861e;
+        border: 2px solid #f6861e;
+}
+
+/* modify the form fields width */
+.field-group input[type="text"] {
+    width: 360px;
+    height: 40px;
+}
+
+.hide_opp{
+    display: flex;
+    align-items: center;
+}
+.hide_opp_text{
+    margin: 0;
+    padding-right: 10px;
 }

@@ -97,9 +97,21 @@ class Ghl_Cf7_Pro_Admin {
 		 */
 
 		wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ghl-cf7-pro-admin.js', array( 'jquery' ), $this->version, false );
-
+		// wp_enqueue_script( $this->plugin_name, plugin_dir_url( __FILE__ ) . 'js/ghl-cf7-pro-pipeline.js', array( 'jquery' ), $this->version, false );
+        wp_localize_script($this->plugin_name, 'ghlcf7pro_form_data', array('ajaxurl' => admin_url( 'admin-ajax.php' )));
 	}
 
+	//send the value to ajax
+function ghlcf7pro_check_form_data(){
+      $form_id = sanitize_text_field($_POST['form_id']);
+      if(!empty($form_id)){
+		  $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
+          $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$form_id , '');
+         wp_send_json_success(array("success" => true, 'pipeline_stages' =>$saved_pipeline_stage,'opp_check'=>$oppcheck));
+        }
+        wp_send_json_success(array("success" => false));
+        die();
+    }
 	function ghlcf7pro_form_settings_tab($panels) {
         $panels['custom_tab'] = array(
             'title'    => __('GHL For CF7 Pro', 'ghl-cf7'),
@@ -114,6 +126,24 @@ class Ghl_Cf7_Pro_Admin {
 				require plugin_dir_path(__FILE__) . 'partials/ghl-cf7-pro-form-tag.php';
 			}
 		}
+
+	// function test_cf7pro($data, $options, $args){
+	// 	$data = [];
+	// foreach ($options as $option) {
+	// 	if ($option === 'checkbox_options') {
+	// 		$data = array_merge($data, ['Checkbox Option A', 'Checkbox Option B']);
+	// 	}
+
+	// 	if ($option === 'radio_options') {
+	// 		$data = array_merge($data, ['Radio Option A', 'Radio Option B']);
+	// 	}
+
+	// 	if ($option === 'select_options') {
+	// 		$data = array_merge($data, ['Select Option A', 'Select Option B']);
+	// 	}
+	// }
+	// return $data;
+	// }
 
 	function ghlcf7pro_save_form_settings($contact_form) {
 	// Retrieve values from the form
@@ -180,7 +210,11 @@ class Ghl_Cf7_Pro_Admin {
 		 update_option( 'ghl_pipeline_stage_'.$contact_form->id, $pipeline_stage );
 	 }
 	 
-		 
+	if(isset($_POST['opp_check']))
+	 {
+		$opp_checkbox = isset($_POST['opp_check']) ? 'yes' : 'no'; 
+		 update_option('ghlcf7pro-opp-checkbox', $opp_checkbox);
+	 }	 
     
 	 
 		
@@ -248,7 +282,7 @@ public function connect_to_ghlcf7pro()
 				if($location_name){
 					 $ghl_data['ghlcf7pro_location_name_'. $form_id] = $location_name;
 				}
-
+                update_option( 'ghlcf7pro_location_connected_'. $form_id, 1 );
             } else {
 				$ghl_data['ghlcf7pro_access_token'] = $_GET["atoken"];
                 $ghl_data['ghlcf7pro_refresh_token'] = $_GET["rtoken"];
@@ -264,7 +298,7 @@ public function connect_to_ghlcf7pro()
 				
                
             }
-			update_option( 'ghlcf7pro_location_connected', 1 );
+			
 		
 
             foreach ($ghl_data as $ghl_key => $ghl_value) {
@@ -361,7 +395,12 @@ public function connect_to_ghlcf7pro()
 		$submission = WPCF7_Submission::get_instance();
 		$form_id = $contact_form->id();
         $location_id = (!empty(get_option("ghlcf7pro_locationId_" . $form_id))) ? get_option("ghlcf7pro_locationId_" . $form_id) : get_option("ghlcf7pro_locationId"); 
-		$tags= (!empty(get_option("ghlcf7pro_tag_" . $form_id))) ? get_option("ghlcf7pro_tag_" . $form_id) : get_option("ghlcf7pro-global-tag-names");
+		//$tags= (!empty(get_option("ghlcf7pro_tag_" . $form_id))) ? get_option("ghlcf7pro_tag_" . $form_id) : get_option("ghlcf7pro-global-tag-names");
+		$tags= get_option("ghlcf7pro_tag_" . $form_id);
+		$globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
+		if($globalcheck==='yes' && !empty(get_option("ghlcf7pro-global-tag-names"))){
+			$tags=get_option("ghlcf7pro-global-tag-names").','.$tags;
+		}
 		
 		if (!$submission) {
 			return;
@@ -458,37 +497,32 @@ public function connect_to_ghlcf7pro()
          $ghl_args['locationId'] = $location_id;
 		 $ghl_opp_args['locationId'] = $location_id;
          $ghl_args['tags']=$tags;
-		//  echo '<pre>';
-        // print_r($ghl_opp_args);
+		 $ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
+		 $contact_id=ghlcf7pro_create_contact($ghl_args,$ghlcf7pro_access_token);
+		// echo '<pre>';
+        // print_r($test);
         // echo '</pre>';
         // die('sgg');
-		//implement auth V2 GHL API
-		$ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
-		$endpoint = "https://services.leadconnectorhq.com/contacts/upsert";
-		$ghl_version = '2021-07-28';
-
-		$request_args = array(
-			'body' 		=> $ghl_args,
-			'headers' 	=> array(
-				'Authorization' => "Bearer {$ghlcf7pro_access_token}",
-				'Version' 		=> $ghl_version
-			),
-		);
-
-		$response = wp_remote_post( $endpoint, $request_args );
-		$http_code = wp_remote_retrieve_response_code( $response );
-
-		if ( 200 === $http_code || 201 === $http_code ) {
-
-			$body = json_decode( wp_remote_retrieve_body( $response ) );
-			$contact = $body->contact;
-
-			return $contact;
-		}
-
+		//to save the opp as a name
+        $email_pipeline = !empty($ghl_args['email']) ? $ghl_args['email'] : "NULL";
+        $saved_pipeline_name = get_option('ghl_pipeline_name_'.$post->id, ''); // Default empty if not set
+        $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
+		//if click the opp checkbox then send the value.
+		$data=array(
+            'pipelineId' => $saved_pipeline_name,
+            'name' => $email_pipeline,
+            'locationId' => $ghl_opp_args['locationId'],
+            'pipelineStageId'=> $saved_pipeline_stage,
+            'contactId' =>$contact_id,
+            'status'=> "open",
+            'customFields' =>isset($ghl_opp_args['customFieldsopp']) ? $ghl_opp_args['customFieldsopp'] : ''
+            );
+		//create opporrtunity
+		$opp=ghlcf7pro_create_opportunity($data,$ghlcf7pro_access_token);		
 		
-		// }
 	}
+
+	
 
 
 }
