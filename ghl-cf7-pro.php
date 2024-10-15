@@ -38,6 +38,7 @@ if ( ! defined( 'WPINC' ) ) {
 define( 'GHL_CF7_PRO_VERSION', '1.0.0' );
 define( 'GHLCF7PRO_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 define( 'GHLCF7PRO_LOCATION_CONNECTED', false );
+define( 'GHLCF7PRO_PATH', plugin_basename( __FILE__ ));
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-ghl-cf7-pro-activator.php

@@ -5,11 +5,13 @@ $settings_url = (isset($_GET['post'])) ? urlencode(admin_url('admin.php?page=wpc
 $server_url = "https://server.ibsofts.com/one-extension/market_app.php";
 $connect_url= add_query_arg(array('redirect_page' => $settings_url), $server_url);
 $loc_id=get_option('ghlcf7pro_locationId_' . $post->id);
-$loc_name=get_option('ghlcf7pro_location_name_' . $post->id);
+$loc_name=(!empty(get_option("ghlcf7pro_location_name_" . $post->id))) ? get_option("ghlcf7pro_location_name_" . $post->id) : get_option("ghlcf7pro_location_name");
+
+
 $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
 
 ?>
-<div class="ghlcf7-tab-content">
+<div class="ghlcf7pro-tab-content">
     <?php
     
     //$saved_mapping = get_option('ghl_fields_map_' . $post->id , []);
@@ -56,7 +58,6 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
         // Decode the JSON into a PHP array
        $opp_customfields_mapping = json_decode($opp_custom_fields_json, true);
     }
-    // var_dump($customfields_mapping);
     
    
     // Retrieve custom fields from API
@@ -65,21 +66,7 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
     $ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
     $custom_fields = ghlcf7pro_get_custom_fields($location_id, $ghlcf7pro_access_token);
     $opp_custom_fields=ghlcf7pro_get_opp_custom_fields($location_id, $ghlcf7pro_access_token);
-    // $get_stages=ghlcf7pro_get_pipeline($location_id, $ghlcf7pro_access_token);
-    // echo '<pre>';
-    // print_r($get_stages);
-    // echo '</pre>';
-    // die('stages');
-
-
-    // Example form fields (replace with your actual form fields)
-    $form_fields = [
-    'full_name' => 'Full Name',
-    'email' => 'Email',
-    'phone' => 'Phone',
-    'address' => 'Address'
-    ];
-
+    
     // Example GHL fields (replace with actual GHL fields)
     $ghl_fields = [
     'firstName' => 'First Name',
@@ -288,12 +275,8 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
     $saved_pipeline_name = get_option('ghl_pipeline_name_'.$post->id, ''); // Default empty if not set
     $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
     $connected_location = get_option('ghlcf7pro_location_connected_'.$post->id, '');
-    // wp_enqueue_script('ghl-cf7-pro-admin', plugin_dir_url( __FILE__ ) .'/js/ghl-cf7-pro-pipeline.js', array('jquery'), '1.0.0', true);
-    //  wp_localize_script('ghl-cf7-pro-admin', 'ghlData', array(
-    // 'savedPipelineName' => $saved_pipeline_name,
-    // 'savedPipelineStage' => $saved_pipeline_stage,
-    // ));
-    
+    $connected_global_location = get_option('ghlcf7pro_location_connected', '');
+   
     // If API response contains data
     if (!empty($get_stages)) {
     ?>
@@ -334,16 +317,21 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
     <?php if ($connected_location) { ?>
     <div class="form-spe">
         <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
-        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
+        <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
             Subaccount</a>
-        <p>Location ID: <?php echo esc_html($loc_id); ?></p>
-        <p>Location Name: <?php echo esc_html($loc_name); ?></p>
+        <p>Connected Location Name: <?php echo esc_html($loc_name); ?></p>
     </div>
     <?php } else { ?>
     <div class="form-spe">
         <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
-        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
+        <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
             Subaccount</a>
+        <?php if($connected_global_location){?>
+        <p>
+            This connection will override the global connection. Currently <?php echo esc_html($loc_name); ?> is
+            connected.
+        </p>
+        <?php }?>
     </div>
     <?php } ?>
 </div>

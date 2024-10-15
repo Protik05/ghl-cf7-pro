@@ -15,26 +15,13 @@ $Checklickey = get_option('ghlcf7pro-lic-keys', '');
 <div id="ghlcf7-options">
     <h1><?php esc_html_e('Set Your Extension License Key', 'ghl-cf7'); ?></h1>
     <hr />
+    <div class="license_key_container">
 
-    <form id="ghlcf7-settings-form" method="POST">
-
-        <table class="form-table" role="presentation">
-            <tbody>
-                <tr>
-                    <th scope="row">
-                        <label><?php esc_html_e('License Keys: ', 'ghl-cf7'); ?></label>
-                    </th>
-                    <td>
-                        <input type="text" name="global-lickey" value="<?php echo esc_attr($Checklickey); ?>">
-                    </td>
-                </tr>
-
-
-            </tbody>
-        </table>
-
-        <div>
-            <button class="ghl_cf7 button" type="submit" name="ghl_lickey">Update Settings</button>
-        </div>
-    </form>
+        <h2>Enter License Key </h2>
+        <form id="ghl-license-key-form1" method="post" action="">
+            <input type="text" id="license-key-input" name="license_key" required
+                value="<?php echo esc_attr($Checklickey); ?>">
+            <input type="submit" value="Activate" class="ghl_connect button">
+        </form>
+    </div>
 </div>

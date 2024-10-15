@@ -123,6 +123,8 @@ class Ghl_Cf7_Pro {
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'public/class-ghl-cf7-pro-public.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/settings-page.php';
 		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'ghl_cf7pro_api/ghl-cf7pro-all-apis.php';
+		require_once plugin_dir_path( dirname( __FILE__ ) ) . 'includes/class-ghl-cf7-pro-updater.php';
+		
 		$this->loader = new Ghl_Cf7_Pro_Loader();
 
 	}
@@ -165,8 +167,13 @@ class Ghl_Cf7_Pro {
 	    $this->loader->add_action('wp_loaded',$plugin_admin,'refresh_ghl_token_ghlcf7pro');
 		$this->loader->add_action('wpcf7_submit',$plugin_admin, 'ghlcf7pro_send_form_data_to_api');
         $this->loader->add_action( 'wp_ajax_ghlcf7pro_check_form_data', $plugin_admin, 'ghlcf7pro_check_form_data'); 
-		//test part
-		// $this->loader->add_filter('wpcf7_form_tag_data_option',$plugin_admin, 'test_cf7pro', 10, 3);
+		
+		$updater = new Ghl_Cf7_Pro_Updater();
+
+        $this->loader->add_filter('plugins_api', $updater, 'ghlcf7pro_info', 20, 3);
+        $this->loader->add_filter('site_transient_update_plugins', $updater,'ghlcf7pro_update');
+        $this->loader->add_action('upgrader_process_complete', $updater, 'ghlcf7pro_purge', 10, 2);
+		$this->loader->add_action('in_plugin_update_message-' . GHLCF7PRO_PATH, $updater, 'ghlcf7pro_update_message', 10, 2);
 	}
 
 	/**

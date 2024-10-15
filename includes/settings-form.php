@@ -65,13 +65,13 @@
                             <?php echo esc_html($ghlcf7pro_locationId); ?></p>
                         <?php } ?>
                         <p class="description">To connect another subaccount location, click below:</p>
-                        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect Another
+                        <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect Another
                             Subaccount</a>
                     </div>
                     <?php } else { ?>
                     <div class="not-connected-location">
                         <p class="description">You're not connected to any subaccount location yet.</p>
-                        <a class="ghl_connect button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
+                        <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
                             Subaccount</a>
                     </div>
                     <?php } ?>

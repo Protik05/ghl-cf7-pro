@@ -127,23 +127,7 @@ function ghlcf7pro_check_form_data(){
 			}
 		}
 
-	// function test_cf7pro($data, $options, $args){
-	// 	$data = [];
-	// foreach ($options as $option) {
-	// 	if ($option === 'checkbox_options') {
-	// 		$data = array_merge($data, ['Checkbox Option A', 'Checkbox Option B']);
-	// 	}
-
-	// 	if ($option === 'radio_options') {
-	// 		$data = array_merge($data, ['Radio Option A', 'Radio Option B']);
-	// 	}
-
-	// 	if ($option === 'select_options') {
-	// 		$data = array_merge($data, ['Select Option A', 'Select Option B']);
-	// 	}
-	// }
-	// return $data;
-	// }
+	
 
 	function ghlcf7pro_save_form_settings($contact_form) {
 	// Retrieve values from the form
@@ -209,18 +193,11 @@ function ghlcf7pro_check_form_data(){
 		 update_option( 'ghl_pipeline_name_'.$contact_form->id, $pipeline_name );
 		 update_option( 'ghl_pipeline_stage_'.$contact_form->id, $pipeline_stage );
 	 }
-	 
-	if(isset($_POST['opp_check']))
-	 {
-		$opp_checkbox = isset($_POST['opp_check']) ? 'yes' : 'no'; 
-		 update_option('ghlcf7pro-opp-checkbox', $opp_checkbox);
-	 }	 
-    
-	 
-		
-    // update_option( 'ghl_fields_map_'.$contact_form->id, $ghl_fields_map );
-
-    
+	
+	 //save the opportunity checkbox value.
+	$opp_checkbox = isset($_POST['opp_check']) ? 'yes' : 'no'; 
+	update_option('ghlcf7pro-opp-checkbox', $opp_checkbox);
+	
     //save it inside our own table.
     global $wpdb;
     $table_name = $wpdb->prefix . "ghlcf7pro_formSpecMapping";
@@ -283,7 +260,8 @@ public function connect_to_ghlcf7pro()
 					 $ghl_data['ghlcf7pro_location_name_'. $form_id] = $location_name;
 				}
                 update_option( 'ghlcf7pro_location_connected_'. $form_id, 1 );
-            } else {
+            } 
+			else {
 				$ghl_data['ghlcf7pro_access_token'] = $_GET["atoken"];
                 $ghl_data['ghlcf7pro_refresh_token'] = $_GET["rtoken"];
                 $ghl_data['ghlcf7pro_locationId'] = $_GET["loctid"];
@@ -295,7 +273,7 @@ public function connect_to_ghlcf7pro()
 				if($location_name){
 					 $ghl_data['ghlcf7pro_location_name'] = $location_name;
 				}
-				
+				 update_option( 'ghlcf7pro_location_connected', 1 );
                
             }
 			
@@ -377,10 +355,7 @@ public function connect_to_ghlcf7pro()
                     update_option("ghlcf7pro_refresh_token", $response["refresh_token"]);
                     update_option("ghlcf7pro_token_expire", $ghl_token_expire);
                 } 
-				// else {
-                //     $ghl_log = new GFGHLExProAddOn_Log();
-                //     $ghl_log->log_error('Refresh Token Error: ' . $response['message']);
-                // }
+				
             }
         }
 
@@ -499,16 +474,15 @@ public function connect_to_ghlcf7pro()
          $ghl_args['tags']=$tags;
 		 $ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
 		 $contact_id=ghlcf7pro_create_contact($ghl_args,$ghlcf7pro_access_token);
-		// echo '<pre>';
-        // print_r($test);
-        // echo '</pre>';
-        // die('sgg');
+		
 		//to save the opp as a name
         $email_pipeline = !empty($ghl_args['email']) ? $ghl_args['email'] : "NULL";
-        $saved_pipeline_name = get_option('ghl_pipeline_name_'.$post->id, ''); // Default empty if not set
-        $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
+        $saved_pipeline_name = get_option('ghl_pipeline_name_'.$form_id, ''); // Default empty if not set
+        $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$form_id, ''); // Default empty if not set
 		//if click the opp checkbox then send the value.
-		$data=array(
+		$oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
+		if($oppcheck==='yes'){
+			$data=array(
             'pipelineId' => $saved_pipeline_name,
             'name' => $email_pipeline,
             'locationId' => $ghl_opp_args['locationId'],
@@ -518,11 +492,8 @@ public function connect_to_ghlcf7pro()
             'customFields' =>isset($ghl_opp_args['customFieldsopp']) ? $ghl_opp_args['customFieldsopp'] : ''
             );
 		//create opporrtunity
-		$opp=ghlcf7pro_create_opportunity($data,$ghlcf7pro_access_token);		
-		
+		$opp=ghlcf7pro_create_opportunity($data,$ghlcf7pro_access_token);
+		}
 	}
-
-	
-
 
 }

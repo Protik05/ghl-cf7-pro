@@ -31,20 +31,20 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
 			$tab = isset( $_GET['tab'] ) ? sanitize_text_field( $_GET['tab'] ) : $default_tab;
 			?>
 
-<div class="wrap main-con">
-    <div class="ghl-header">
-        <!-- Logo -->
-        <div class="logo">
+<div class="wrap main-con-ghlcf7pro">
+    <div class="ghlcf7pro-header">
+        <!-- logo-ghlcf7pro-->
+        <div class="logo-ghlcf7pro">
             <img src="<?php echo esc_url(plugins_url('images/GHLCF7.png', __DIR__)); ?>" alt="GHLCF7-Logo" />
 
         </div>
 
         <h1>GHL for Contact Form 7 Pro </h1>
     </div>
-    <div class="ghl-container">
+    <div class="ghlcf7pro-container">
 
-        <div class="ghl-content">
-            <div class="ghl-tabs">
+        <div class="ghlcf7pro-content">
+            <div class="ghlcf7pro-tabs">
                 <h2 class="nav-tab-wrapper-vertical">
                     <a href="?page=ib-ghlcf7pro"
                         class="nav-tab <?php if($tab===null):?>nav-tab-active<?php endif; ?>">Connect with GHL</a>
@@ -60,7 +60,7 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
             </div>
 
 
-            <div class="tab-content">
+            <div class="tab-content-ghlcf7pro">
                 <?php switch($tab) :
 					case 'lickey':
 						require_once plugin_dir_path( __FILE__ )."/ghl-cf7-pro-lic-keys.php";
