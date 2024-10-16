@@ -4,7 +4,14 @@ if ( ! function_exists( 'ghlcf7pro_get_custom_fields' ) ) {
     
     function ghlcf7pro_get_custom_fields($loc,$api_key) {
 
+        if (empty($api_key)) {
 
+           $ghl_log = new GHLCF7PRO_Log();
+            $ghl_log->log_error('Error: Ensure API key is configured in plugin setting or form setting');
+
+            return;
+        }
+		
 		$endpoint = "https://services.leadconnectorhq.com/locations/{$loc}/customFields";
 		$ghl_version = '2021-07-28';
 

@@ -46,16 +46,17 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
         <div class="ghlcf7pro-content">
             <div class="ghlcf7pro-tabs">
                 <h2 class="nav-tab-wrapper-vertical">
+                    <a href="?page=ib-ghlcf7pro&tab=lickey"
+                        class="nav-tab <?php if($tab==='lickey'):?>nav-tab-active<?php endif; ?>">License
+                        Key</a>
                     <a href="?page=ib-ghlcf7pro"
                         class="nav-tab <?php if($tab===null):?>nav-tab-active<?php endif; ?>">Connect with GHL</a>
                     <a href="?page=ib-ghlcf7pro&tab=global"
                         class="nav-tab <?php if($tab==='global'):?>nav-tab-active<?php endif; ?>">Global Tags</a>
-                    <a href="?page=ib-ghlcf7pro&tab=lickey"
-                        class="nav-tab <?php if($tab==='lickey'):?>nav-tab-active<?php endif; ?>">License
-                        Key</a>
-
                     <a href="?page=ib-ghlcf7pro&tab=support"
                         class="nav-tab <?php if($tab==='support'):?>nav-tab-active<?php endif; ?>">Help/Support</a>
+                    <a href="?page=ib-ghlcf7pro&tab=log"
+                        class="nav-tab <?php if($tab==='log'):?>nav-tab-active<?php endif; ?>">Log</a>
                 </h2>
             </div>
 
@@ -70,6 +71,9 @@ if ( ! class_exists( 'GHLCF7PRO_Settings_Page' ) ) {
 						break;
 					case 'support':
 						require_once plugin_dir_path( __FILE__ )."/help-page.php";
+					break;
+					case 'log':
+						require_once plugin_dir_path( __FILE__ )."/ghl-cf7-pro-log-viewer.php";
 					break;
 					default:
 						require_once plugin_dir_path( __FILE__ )."/settings-form.php"; 

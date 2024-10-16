@@ -105,7 +105,7 @@ class Ghl_Cf7_Pro_Admin {
 function ghlcf7pro_check_form_data(){
       $form_id = sanitize_text_field($_POST['form_id']);
       if(!empty($form_id)){
-		  $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
+		  $oppcheck = get_option('ghlcf7pro-opp-checkbox_'.$form_id, 'no');
           $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$form_id , '');
          wp_send_json_success(array("success" => true, 'pipeline_stages' =>$saved_pipeline_stage,'opp_check'=>$oppcheck));
         }
@@ -130,6 +130,16 @@ function ghlcf7pro_check_form_data(){
 	
 
 	function ghlcf7pro_save_form_settings($contact_form) {
+	//disconnect location operation for form specific part
+	 if (isset($_POST['disconnect_form_loc'])) {
+        delete_option('ghlcf7pro_access_token_'.$contact_form->id);
+        delete_option('ghlcf7pro_refresh_token_'.$contact_form->id);
+        delete_option('ghlcf7pro_locationId_'.$contact_form->id);
+        delete_option('ghlcf7pro_client_id_'.$contact_form->id);
+        delete_option('ghlcf7pro_client_secret_'.$contact_form->id);
+        delete_option('ghlcf7pro_location_name_'.$contact_form->id);
+        delete_option('ghlcf7pro_token_expire_'.$contact_form->id);      
+    }	
 	// Retrieve values from the form
 	$inputValue = isset($_POST['ghlcf7pro_tag']) ? sanitize_text_field($_POST['ghlcf7pro_tag']) : '';
  
@@ -185,7 +195,7 @@ function ghlcf7pro_check_form_data(){
             }
         }	
 	 }
-     
+     //save the pipeline name and stages
 	  if(isset($_POST['pipeline']) && isset($_POST['pipeline_stage']))
 	 {
 		 $pipeline_name = $_POST['pipeline']; 
@@ -196,7 +206,7 @@ function ghlcf7pro_check_form_data(){
 	
 	 //save the opportunity checkbox value.
 	$opp_checkbox = isset($_POST['opp_check']) ? 'yes' : 'no'; 
-	update_option('ghlcf7pro-opp-checkbox', $opp_checkbox);
+	update_option('ghlcf7pro-opp-checkbox_'.$contact_form->id, $opp_checkbox);
 	
     //save it inside our own table.
     global $wpdb;
@@ -236,6 +246,8 @@ function ghlcf7pro_check_form_data(){
 			array('%s', '%s' ,'%s', '%s')
 		);
     }
+
+	
 	}
     
         
@@ -259,7 +271,7 @@ public function connect_to_ghlcf7pro()
 				if($location_name){
 					 $ghl_data['ghlcf7pro_location_name_'. $form_id] = $location_name;
 				}
-                update_option( 'ghlcf7pro_location_connected_'. $form_id, 1 );
+                // update_option( 'ghlcf7pro_location_connected_'. $form_id, 1 );
             } 
 			else {
 				$ghl_data['ghlcf7pro_access_token'] = $_GET["atoken"];
@@ -273,7 +285,7 @@ public function connect_to_ghlcf7pro()
 				if($location_name){
 					 $ghl_data['ghlcf7pro_location_name'] = $location_name;
 				}
-				 update_option( 'ghlcf7pro_location_connected', 1 );
+				//  update_option( 'ghlcf7pro_location_connected', 1 );
                
             }
 			
@@ -320,10 +332,10 @@ public function connect_to_ghlcf7pro()
                             update_option("ghlcf7pro_refresh_token_" . $form->ID, $response["refresh_token"]);
                             update_option("ghlcf7pro_token_expire_" . $form->ID, $ghl_token_expire);
                         } 
-						// else {
-                        //     $ghl_log = new GFGHLExProAddOn_Log();
-                        //     $ghl_log->log_error('Refresh Token Error for Form ID ' . $form->ID . ': ' . $response['message']);
-                        // }
+						else {
+                            $ghl_log = new GHLCF7PRO_Log();
+                            $ghl_log->log_error('Refresh Token Error for Form ID ' . $form->ID . ': ' . $response['message']);
+                        }
                     }
                 }
 			
@@ -354,7 +366,10 @@ public function connect_to_ghlcf7pro()
                     update_option("ghlcf7pro_access_token", $response["access_token"]);
                     update_option("ghlcf7pro_refresh_token", $response["refresh_token"]);
                     update_option("ghlcf7pro_token_expire", $ghl_token_expire);
-                } 
+                } else {
+                    $ghl_log = new GHLCF7PRO_Log();
+                    $ghl_log->log_error('Refresh Token Error: ' . $response['message']);
+                }
 				
             }
         }
@@ -365,11 +380,19 @@ public function connect_to_ghlcf7pro()
     //cf7 after form submission hook.
    function ghlcf7pro_send_form_data_to_api($contact_form) {
 		// Get the submitted form data
+		$ghl_log = new GHLCF7PRO_Log();
 		global $wpdb;
 		$table_name = $wpdb->prefix  . "ghlcf7pro_formSpecMapping";
 		$submission = WPCF7_Submission::get_instance();
 		$form_id = $contact_form->id();
+		$form_name = $contact_form->name();
         $location_id = (!empty(get_option("ghlcf7pro_locationId_" . $form_id))) ? get_option("ghlcf7pro_locationId_" . $form_id) : get_option("ghlcf7pro_locationId"); 
+		$ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
+		if (empty($ghlcf7pro_access_token) || empty($location_id)) {
+            $ghl_log->log_error('Error: Ensure access token and location ID is configured.');
+            return;
+        }
+		
 		//$tags= (!empty(get_option("ghlcf7pro_tag_" . $form_id))) ? get_option("ghlcf7pro_tag_" . $form_id) : get_option("ghlcf7pro-global-tag-names");
 		$tags= get_option("ghlcf7pro_tag_" . $form_id);
 		$globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
@@ -472,15 +495,14 @@ public function connect_to_ghlcf7pro()
          $ghl_args['locationId'] = $location_id;
 		 $ghl_opp_args['locationId'] = $location_id;
          $ghl_args['tags']=$tags;
-		 $ghlcf7pro_access_token = (!empty(get_option("ghlcf7pro_access_token_" . $form_id))) ? get_option("ghlcf7pro_access_token_" . $form_id) : get_option("ghlcf7pro_access_token");
-		 $contact_id=ghlcf7pro_create_contact($ghl_args,$ghlcf7pro_access_token);
+		 $contact_id=ghlcf7pro_create_contact($ghl_args,$ghlcf7pro_access_token,$form_id,$form_name);
 		
 		//to save the opp as a name
         $email_pipeline = !empty($ghl_args['email']) ? $ghl_args['email'] : "NULL";
         $saved_pipeline_name = get_option('ghl_pipeline_name_'.$form_id, ''); // Default empty if not set
         $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$form_id, ''); // Default empty if not set
 		//if click the opp checkbox then send the value.
-		$oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
+		$oppcheck = get_option('ghlcf7pro-opp-checkbox_'.$form_id, 'no');
 		if($oppcheck==='yes'){
 			$data=array(
             'pipelineId' => $saved_pipeline_name,

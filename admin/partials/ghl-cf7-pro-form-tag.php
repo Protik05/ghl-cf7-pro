@@ -5,10 +5,10 @@ $settings_url = (isset($_GET['post'])) ? urlencode(admin_url('admin.php?page=wpc
 $server_url = "https://server.ibsofts.com/one-extension/market_app.php";
 $connect_url= add_query_arg(array('redirect_page' => $settings_url), $server_url);
 $loc_id=get_option('ghlcf7pro_locationId_' . $post->id);
-$loc_name=(!empty(get_option("ghlcf7pro_location_name_" . $post->id))) ? get_option("ghlcf7pro_location_name_" . $post->id) : get_option("ghlcf7pro_location_name");
+$form_loc_name=get_option("ghlcf7pro_location_name_" . $post->id);
+$global_loc_name=get_option("ghlcf7pro_location_name");
+$oppcheck = get_option('ghlcf7pro-opp-checkbox_'. $post->id, 'no');
 
-
-$oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
 
 ?>
 <div class="ghlcf7pro-tab-content">
@@ -91,7 +91,7 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
         </p>
         <?php
         // Loop through saved mapping and render the fields
-        if (!empty($saved_mapping)) {
+        if (!empty($saved_mapping) && !empty($ghl_fields)) {
             foreach ($saved_mapping as $map) {
                 ?>
         <div class="mapping-fields-row">
@@ -151,7 +151,7 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
         </p>
         <?php
         //for custom fields and form fields mapping.
-        if (!empty($customfields_mapping)) {
+        if (!empty($customfields_mapping) && !empty($custom_fields)) {
             foreach ($customfields_mapping as $map) {
                 ?>
         <div class="custom-mapping-fields-row">
@@ -184,10 +184,12 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
                 <label>GHL Custom Fields:</label>
                 <select name="ghl_custom_field[]">
                     <option value="">Select GHL Custom Field</option>
+                    <?php if(!empty($custom_fields)) {?>
                     <?php foreach ($custom_fields as $custom_field) { ?>
                     <option value="<?php echo esc_attr($custom_field->id); ?>">
                         <?php echo esc_html($custom_field->name); ?>
                     </option>
+                    <?php } ?>
                     <?php } ?>
                 </select>
             </div>
@@ -209,17 +211,15 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
         </p>
         <input type="checkbox" name="opp_check" value="yes" <?php checked($oppcheck, 'yes'); ?>>
     </div>
-    <!-- opportunity custom fields container -->
     <div class="ghlcf7pro_opp_hide">
         <div class="mapping-opp-custom-fields-container">
             <p>
                 <strong>GHL Opportunity custom fields mapping with Form fields</strong>
             </p>
             <?php
-        //for custom fields and form fields mapping.
-        if (!empty($opp_customfields_mapping)) {
-            foreach ($opp_customfields_mapping as $map) {
-                ?>
+            //for custom fields and form fields mapping.
+            if (!empty($opp_customfields_mapping)  && !empty($opp_custom_fields)) {
+             foreach ($opp_customfields_mapping as $map) {?>
             <div class="opp-custom-mapping-fields-row">
                 <div class="opp-custom-field-group">
                     <label>GHL Opportunity Custom Fields:</label>
@@ -250,10 +250,12 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
                     <label>GHL Opportunity Custom Fields:</label>
                     <select name="ghl_opp_custom_field[]">
                         <option value="">Select a Field</option>
+                        <?php if(!empty($opp_custom_fields)) {?>
                         <?php foreach ($opp_custom_fields as $custom_field) { ?>
                         <option value="<?php echo esc_attr($custom_field->id); ?>">
                             <?php echo esc_html($custom_field->name); ?>
                         </option>
+                        <?php } ?>
                         <?php } ?>
                     </select>
                 </div>
@@ -266,7 +268,7 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
 
             </div>
             <?php
-        }
+           }
         ?>
         </div>
         <?php
@@ -274,8 +276,8 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
     $get_stages = ghlcf7pro_get_pipeline($location_id, $ghlcf7pro_access_token);
     $saved_pipeline_name = get_option('ghl_pipeline_name_'.$post->id, ''); // Default empty if not set
     $saved_pipeline_stage = get_option('ghl_pipeline_stage_'.$post->id, ''); // Default empty if not set
-    $connected_location = get_option('ghlcf7pro_location_connected_'.$post->id, '');
-    $connected_global_location = get_option('ghlcf7pro_location_connected', '');
+    $connected_location_id = get_option('ghlcf7pro_locationId_'.$post->id, '');
+    $connected_global_loc_id = get_option('ghlcf7pro_locationId', '');
    
     // If API response contains data
     if (!empty($get_stages)) {
@@ -304,34 +306,41 @@ $oppcheck = get_option('ghlcf7pro-opp-checkbox', 'no');
                 </select>
             </div>
         </div>
+        <?php
+    } else {
+        echo "No pipelines available.";
+    }
+    ?>
     </div>
-    <?php
-} else {
-    echo "No pipelines available.";
-}
-?>
-    <div class="ghlcf7_setting_tag">
+    <div class="ghlcf7pro_setting_tag">
         <label for="ghlcf7pro_tag">Enter Tags to Send:</label>
         <input type="text" id="ghlcf7pro_tag" name="ghlcf7pro_tag" value="<?php echo esc_attr($inputValue); ?>">
     </div>
-    <?php if ($connected_location) { ?>
+    <?php if ($connected_location_id) { ?>
     <div class="form-spe">
-        <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
-        <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
-            Subaccount</a>
-        <p>Connected Location Name: <?php echo esc_html($loc_name); ?></p>
+        <label for="ghlcf7pro_tag">Connect GHL Subaccount: </label>
+        <form method="post">
+            <button class="ghl_cf7pro_btn button" type="submit" name="disconnect_form_loc">Disconnect
+                from
+                GHL</button>
+        </form>
+        <p><strong>Connected Location Name:</strong> <?php echo esc_html($form_loc_name); ?></p>
     </div>
     <?php } else { ?>
     <div class="form-spe">
-        <label for="ghlcf7_tag">Connect GHL Subaccount: </label>
+        <label for="ghlcf7pro_tag">Connect GHL Subaccount: </label>
         <a class="ghl_cf7pro_btn button" href="<?php echo esc_url($connect_url); ?>">Connect GHL
             Subaccount</a>
-        <?php if($connected_global_location){?>
+        <?php if($global_loc_name){?>
         <p>
-            This connection will override the global connection. Currently <?php echo esc_html($loc_name); ?> is
+            This connection will override the global connection. Currently
+            <strong><?php echo esc_html($global_loc_name); ?></strong>
+            is
             connected.
         </p>
         <?php }?>
     </div>
     <?php } ?>
+
+
 </div>

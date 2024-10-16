@@ -1,27 +1,6 @@
 <?php
 if ( ! defined( 'ABSPATH' ) ) exit;
-// add_action('init', function() {
 
-//     if ( isset( $_GET['code'] ) ) {
-//         $code = sanitize_text_field( $_GET['code'] );
-//         $ghlcf7pro_client_id           = get_option( 'ghlcf7pro_client_id' );
-//         $ghlcf7pro_client_secret       = get_option( 'ghlcf7pro_client_secret' );
-        
-//         $result = ghlcf7pro_get_first_auth_code($code, $ghlcf7pro_client_id, $ghlcf7pro_client_secret);
-        
-//         $ghlcf7pro_access_token = $result->access_token;
-//         $ghlcf7pro_refresh_token = $result->refresh_token;
-//         $ghlcf7pro_locationId = $result->locationId;
-//         // Save data
-//         update_option( 'ghlcf7pro_access_token', $ghlcf7pro_access_token );
-//         update_option( 'ghlcf7pro_refresh_token', $ghlcf7pro_refresh_token );
-//         update_option( 'ghlcf7pro_locationId', $ghlcf7pro_locationId );
-//         update_option( 'ghlcf7pro_location_connected', 1 );
-
-//         wp_redirect( admin_url( 'admin.php?page=ib-ghlcf7pro' ) );
-//         exit();
-//     }
-// });
 
 add_action('init', function() {
 
@@ -43,7 +22,7 @@ function ghlcf7pro_get_new_access_token()
 
 	$ghlcf7pro_client_id 		= get_option( 'ghlcf7pro_client_id' );
 	$ghlcf7pro_client_secret 	= get_option( 'ghlcf7pro_client_secret' );
-	$refreshToken 			= get_option( 'ghlcf7pro_refresh_token' );
+	$refreshToken 			    = get_option( 'ghlcf7pro_refresh_token' );
 	
 	$endpoint = GHLCF7PRO_GET_TOKEN_API;
 	$body = array(

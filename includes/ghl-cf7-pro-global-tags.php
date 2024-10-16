@@ -16,7 +16,7 @@ $globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
 ?>
 
 <div id="ghlcf7-options">
-    <h1><?php esc_html_e('Set Your Global Tags For Form', 'ghl-cf7'); ?></h1>
+    <h1><?php esc_html_e('Set Your Global Tags For Form', 'ghl-cf7pro'); ?></h1>
     <hr />
 
     <form id="ghlcf7-settings-form" method="POST">
@@ -25,7 +25,7 @@ $globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
             <tbody>
                 <tr>
                     <th scope="row">
-                        <label><?php esc_html_e('Global Tags: ', 'ghl-cf7'); ?></label>
+                        <label><?php esc_html_e('Global Tags: ', 'ghl-cf7pro'); ?></label>
                     </th>
                     <td>
                         <input type="text" name="global-tags" value="<?php echo esc_attr($CheckglobalTag); ?>">
@@ -33,7 +33,7 @@ $globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
                 </tr>
                 <tr>
                     <th scope="row">
-                        <label><?php esc_html_e('Send global tags with form specific tags: ', 'ghl-cf7'); ?></label>
+                        <label><?php esc_html_e('Send global tags with form specific tags: ', 'ghl-cf7pro'); ?></label>
                     </th>
                     <td>
                         <input type="checkbox" name="glob_check" value="yes" <?php checked($globalcheck, 'yes'); ?>>
@@ -44,7 +44,7 @@ $globalcheck = get_option('ghlcf7pro-global-checkbox', 'no');
         </table>
 
         <div>
-            <button class="ghl_cf7 button" type="submit" name="ghl_global">Update Settings</button>
+            <button class="ghl_cf7 button" type="submit" name="ghl_global">Save Settings</button>
         </div>
     </form>
 </div>

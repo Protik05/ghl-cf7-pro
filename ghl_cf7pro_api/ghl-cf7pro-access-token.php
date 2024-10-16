@@ -27,11 +27,13 @@ if ( ! function_exists( 'ghlcf7pro_get_access_token' ) ) {
 
         curl_close($curl);
 
-        // if ($err) {
-        //     $this->log->log_error("Error: ".$err);
-        // } else {
+        if ($err) {
+             $ghl_log = new GHLCF7PRO_Log();
+            $ghl_log->log_error("Error: ".$err);
+            
+        } else {
             return $response;
-        // }
+        }
 
     }
 }
